@@ -10,14 +10,12 @@ public class Customer {
 
 
     public Customer(String firstName, String lastName, String password, String confirmPassword, String emailId, String mobileNo, String area, String localAddress) {
-
         FirstName = firstName;
         LastName = lastName;
         Password = password;
         ConfirmPassword = confirmPassword;
         EmailId = emailId;
         MobileNo = mobileNo;
-
         Area = area;
         LocalAddress = localAddress;
     }

@@ -2,16 +2,19 @@ package com.example.foodie.customerFoodPanel;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.cepheuen.elegantnumberbutton.view.ElegantNumberButton;
+import com.example.foodie.chefFoodPanel.FoodDetails;
 import com.example.foodie.chefFoodPanel.UpdateDishModel;
 
 import com.bumptech.glide.Glide;
@@ -23,11 +26,11 @@ import java.util.List;
 public class CustomerHomeAdapter extends RecyclerView.Adapter<CustomerHomeAdapter.ViewHolder> {
 
     private Context mcontext;
-    private List<UpdateDishModel>updateDishModellist;
+    private List<FoodDetails>updateDishModellist;
     DatabaseReference databaseReference;
-    String F4,k;
+    String randomUID,chefId,dishName,dishPrice;
 
-    public CustomerHomeAdapter(Context context,List<UpdateDishModel>updateDishModellist)
+    public CustomerHomeAdapter(Context context,List<FoodDetails>updateDishModellist)
     {
         this.updateDishModellist=updateDishModellist;
         this.mcontext=context;
@@ -43,23 +46,19 @@ public class CustomerHomeAdapter extends RecyclerView.Adapter<CustomerHomeAdapte
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
 
-        final UpdateDishModel updateDishModel=updateDishModellist.get(position);
+        FoodDetails updateDishModel=updateDishModellist.get(position);
         Glide.with(mcontext).load(updateDishModel.getImageURL()).into(holder.imageView);
-        F4=updateDishModel.getRandomUID();
-        k=updateDishModel.getChefId();
-        holder.Dishname.setText(updateDishModel.getDishes());
-        updateDishModel.getRandomUID();
-        updateDishModel.getChefId();
-        holder.price.setText("Price:  " + updateDishModel.getPrice());
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
+        dishName=updateDishModel.getDishes();
+        dishPrice=updateDishModel.getPrice();
+
+        holder.Dishname.setText(dishName);
+        holder.price.setText("Price:  " + dishPrice);
+
+        holder.singleItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 Intent intent=new Intent(mcontext,OrderDish.class);
-                intent.putExtra("FoodMenu",F4);
-                intent.putExtra("ChefId",k);
-
-
+                intent.putExtra("foodDetails", updateDishModel);
                 mcontext.startActivity(intent);
             }
         });
@@ -75,15 +74,14 @@ public class CustomerHomeAdapter extends RecyclerView.Adapter<CustomerHomeAdapte
         ImageView imageView;
         TextView Dishname,price;
         ElegantNumberButton additem;
+        LinearLayout singleItem;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-
             imageView=itemView.findViewById(R.id.menu_image);
             Dishname=itemView.findViewById(R.id.dishname);
             price=itemView.findViewById(R.id.dishprice);
             additem=itemView.findViewById(R.id.number_btn);
-
-
+            singleItem=itemView.findViewById(R.id.singleItem);
         }
     }
 

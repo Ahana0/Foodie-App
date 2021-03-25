@@ -33,6 +33,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -65,10 +66,11 @@ public class UpdateDelete_Dish extends AppCompatActivity {
     FirebaseDatabase firebaseDatabase;
     DatabaseReference databaseReference;
     FirebaseAuth FAuth;
+    FirebaseUser firebaseUser;
     String ID;
     private ProgressDialog progressDialog;
     DatabaseReference dataaa;
-    String area;
+    String area, chefName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,23 +85,23 @@ public class UpdateDelete_Dish extends AppCompatActivity {
         Update_dish = (Button) findViewById(R.id.Updatedish);
         Delete_dish = (Button) findViewById(R.id.Deletedish);
         ID = getIntent().getStringExtra("updatedeletedish");
-
-        String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        FAuth = FirebaseAuth.getInstance();
+        firebaseUser = FAuth.getCurrentUser();
+        String userid = firebaseUser.getUid();
         dataaa = firebaseDatabase.getInstance().getReference("Chef").child(userid);
         dataaa.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Chef chefc = dataSnapshot.getValue(Chef.class);
+                Chef chefInfo = dataSnapshot.getValue(Chef.class);
 
-                area=chefc.getArea();
-
+                area = chefInfo.getArea();
+                chefName = chefInfo.getFname() + " " + chefInfo.getLname();
                 Update_dish.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         description = desc.getEditText().getText().toString().trim();
                         quantity = qty.getEditText().getText().toString().trim();
                         price = pri.getEditText().getText().toString().trim();
-
 
                         if (isValid()) {
                             if (imageuri != null) {
@@ -271,7 +273,7 @@ public class UpdateDelete_Dish extends AppCompatActivity {
 
     private void updatedesc(String uri) {
         ChefId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        FoodDetails info = new FoodDetails(dishes, quantity, price, description, uri, ID, ChefId);
+        FoodDetails info = new FoodDetails(dishes, quantity, price, description, uri, ID, ChefId, chefName);
         firebaseDatabase.getInstance().getReference("FoodDetails").child(area)
                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(ID)
                 .setValue(info).addOnCompleteListener(new OnCompleteListener<Void>() {

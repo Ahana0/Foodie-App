@@ -42,6 +42,7 @@ public class DeliveryPendingOrderFragmentAdapter extends RecyclerView.Adapter<De
     private List<DeliveryShipOrders1> deliveryShipOrders1list;
     private APIService apiService;
     String chefid;
+    LayoutInflater layoutInflater;
 
 
     public DeliveryPendingOrderFragmentAdapter(Context context, List<DeliveryShipOrders1> deliveryShipOrders1list) {
@@ -53,7 +54,7 @@ public class DeliveryPendingOrderFragmentAdapter extends RecyclerView.Adapter<De
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.delivery_pendingorder, parent, false);
-        apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
+//        apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
         return new ViewHolder(view);
     }
 
@@ -69,7 +70,6 @@ public class DeliveryPendingOrderFragmentAdapter extends RecyclerView.Adapter<De
         holder.Vieworder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 Intent intent = new Intent(context, DeliveryPendingOrderView.class);
                 intent.putExtra("Random", randomuid);
                 context.startActivity(intent);

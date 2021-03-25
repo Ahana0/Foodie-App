@@ -2,15 +2,16 @@
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-
-
     <item
         android:id="@+id/pendingOrder"
         android:icon="@drawable/ic_baseline_pending_actions_24"
-
         android:title="Pending Orders" />
     <item
         android:id="@+id/shippingOrder"
         android:icon="@drawable/ic_baseline_directions_bike_24"
         android:title="Shipping Order" />
+    <item
+        android:id="@+id/logout"
+        android:icon="@drawable/ic_logout"
+        android:title="Logout" />
 </menu>

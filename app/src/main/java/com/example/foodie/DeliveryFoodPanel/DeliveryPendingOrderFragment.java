@@ -2,6 +2,7 @@ package com.example.foodie.DeliveryFoodPanel;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,59 +32,48 @@ import java.util.List;
 
 public class DeliveryPendingOrderFragment extends Fragment {
 
-    private RecyclerView recyclerView;
-    private List<DeliveryShipOrders1> deliveryShipOrders1List;
-    private DeliveryPendingOrderFragmentAdapter adapter;
+    public RecyclerView recyclerView;
+    public List<DeliveryShipOrders1> deliveryShipOrders1List= new ArrayList<>();
+    public DeliveryPendingOrderFragmentAdapter adapter;
     private DatabaseReference databaseReference;
     private SwipeRefreshLayout swipeRefreshLayout;
     String deliveryId = "oCpc4SwLVFbKO0fPdtp4R6bmDmI3";
-     Button Log;
-
+View view;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.fragment_pendingorders, null);
+        view = inflater.inflate(R.layout.fragment_pendingorders, null);
         getActivity().setTitle("Pending Orders");
         setHasOptionsMenu(true);
-        /*Log= view.findViewById(R.id.logB);
-        Log.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v){
-                Logout();
-            }});*/
         recyclerView = view.findViewById(R.id.delipendingorder);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        deliveryShipOrders1List = new ArrayList<>();
-        swipeRefreshLayout = view.findViewById(R.id.Swipe);
-        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimaryDark, R.color.green);
-        adapter = new DeliveryPendingOrderFragmentAdapter(getContext(), deliveryShipOrders1List);
-        recyclerView.setAdapter(adapter);
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                deliveryShipOrders1List.clear();
-                recyclerView = view.findViewById(R.id.delipendingorder);
-                recyclerView.setHasFixedSize(true);
-                recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-                deliveryShipOrders1List = new ArrayList<>();
-                DeliveryPendingOrders();
-            }
-        });
+
         DeliveryPendingOrders();
+
+//        swipeRefreshLayout = view.findViewById(R.id.Swipe);
+//        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimaryDark, R.color.green);
+//        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+//            @Override
+//            public void onRefresh() {
+//                DeliveryPendingOrders();
+//                swipeRefreshLayout.setRefreshing(false);
+//            }
+//
+//        });
 
         return view;
     }
 
     private void DeliveryPendingOrders() {
-
         databaseReference = FirebaseDatabase.getInstance().getReference("DeliveryShipOrders").child(deliveryId);
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() { //(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Dishes")
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            //(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Dishes")
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    deliveryShipOrders1List.clear();
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        DatabaseReference data = FirebaseDatabase.getInstance().getReference("DeliveryShipOrders").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(snapshot.getKey()).child("OtherInformation");
+                        DatabaseReference data = FirebaseDatabase.getInstance().getReference("DeliveryShipOrders").child(deliveryId).child(snapshot.getKey()).child("OtherInformation");
                         data.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -91,19 +81,17 @@ public class DeliveryPendingOrderFragment extends Fragment {
                                 deliveryShipOrders1List.add(deliveryShipOrders1);
                                 adapter = new DeliveryPendingOrderFragmentAdapter(getContext(), deliveryShipOrders1List);
                                 recyclerView.setAdapter(adapter);
-                                swipeRefreshLayout.setRefreshing(false);
                             }
-
                             @Override
                             public void onCancelled(@NonNull DatabaseError databaseError) {
 
                             }
                         });
+//                        Log.d("delivery","size:"+deliveryShipOrders1List.size());
 
                     }
-                } else {
-                    swipeRefreshLayout.setRefreshing(false);
                 }
+
             }
 
             @Override
@@ -114,24 +102,4 @@ public class DeliveryPendingOrderFragment extends Fragment {
 
     }
 
-
-       /*@Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        int idd = item.getItemId();
-        if (idd == R.id.LogOut) {
-            Logout();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }*/
-
-    private void Logout() {
-
-        FirebaseAuth.getInstance().signOut();
-        Intent intent = new Intent(getActivity(), MainMenu.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-
-    }
 }

@@ -3,29 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:menu="@menu/logout"
-
-
     >
 
-
-
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/Swipe"
+<!--    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout-->
+<!--        android:id="@+id/Swipe"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        >-->
+<!--        -->
+<!--    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>-->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/delipendingorder"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-
-        >
-
-
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/delipendingorder"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-
-            android:scrollbars="vertical" />
-
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
+        android:scrollbars="vertical" />
 </RelativeLayout>

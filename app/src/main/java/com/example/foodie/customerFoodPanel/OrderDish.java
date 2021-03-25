@@ -1,4 +1,5 @@
 package com.example.foodie.customerFoodPanel;
+
 import com.example.foodie.Chef;
 
 import android.content.DialogInterface;
@@ -9,6 +10,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.foodie.chefFoodPanel.FoodDetails;
 import com.example.foodie.chefFoodPanel.UpdateDishModel;
 
 import androidx.annotation.NonNull;
@@ -27,19 +30,21 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
-public class OrderDish extends AppCompatActivity {
+public class OrderDish extends AppCompatActivity implements Serializable {
 
     String RandomId, ChefID;
     ImageView imageView;
     ElegantNumberButton additem;
     TextView Foodname, ChefName, ChefLoaction, FoodQuantity, FoodPrice, FoodDescription;
     DatabaseReference databaseReference, dataaa, chefdata, reference, data, dataref;
-    String  dishname;
+    String dishname;
     int dishprice;
-    String custID,areaa;
+    String custID, areaa;
     FirebaseDatabase firebaseDatabase;
+    FoodDetails updateDishModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +60,9 @@ public class OrderDish extends AppCompatActivity {
         FoodDescription = (TextView) findViewById(R.id.food_description);
         imageView = (ImageView) findViewById(R.id.image);
         additem = (ElegantNumberButton) findViewById(R.id.number_btn);
+        if(getIntent().getExtras() != null) {
+            updateDishModel = (FoodDetails) getIntent().getSerializableExtra("foodDetails");
+        }
 
         final String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         dataaa = FirebaseDatabase.getInstance().getReference("Customer").child(userid);
@@ -63,53 +71,39 @@ public class OrderDish extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Customer cust = dataSnapshot.getValue(Customer.class);
 
-                areaa=cust.getArea();
+                areaa = cust.getArea();
 
+                RandomId = updateDishModel.getRandomUID();
+                ChefID = updateDishModel.getChefId();
 
-                RandomId = getIntent().getStringExtra("FoodMenu");
-                ChefID = "EAwmsoCB5iSQBEGEF0RN1kb6q8g2";
-                System.out.println("?  "+RandomId+"? "+ChefID+"? "+areaa);
+                Foodname.setText(updateDishModel.getDishes());
+                String qua = "<b>" + "Quantity: " + "</b>" + updateDishModel.getQuantity();
+                FoodQuantity.setText(Html.fromHtml(qua));
+                String ss = "<b>" + "Description: " + "</b>" + updateDishModel.getDescription();
+                FoodDescription.setText(Html.fromHtml(ss));
+                String pri = "<b>" + "Price: Tk " + "</b>" + updateDishModel.getPrice();
+                FoodPrice.setText(Html.fromHtml(pri));
+                Glide.with(OrderDish.this).load(updateDishModel.getImageURL()).into(imageView);
 
-                databaseReference = FirebaseDatabase.getInstance().getReference("FoodDetails").child(areaa).child(ChefID).child(RandomId);
-                databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                chefdata = FirebaseDatabase.getInstance().getReference("Chef").child(ChefID);
+                chefdata.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        UpdateDishModel updateDishModel = dataSnapshot.getValue(UpdateDishModel.class);
-                        Foodname.setText(updateDishModel.getDishes());
-                        String qua = "<b>" + "Quantity: " + "</b>" + updateDishModel.getQuantity();
-                        FoodQuantity.setText(Html.fromHtml(qua));
-                        String ss = "<b>" + "Description: " + "</b>" + updateDishModel.getDescription();
-                        FoodDescription.setText(Html.fromHtml(ss));
-                        String pri = "<b>" + "Price: Tk " + "</b>" + updateDishModel.getPrice();
-                        FoodPrice.setText(Html.fromHtml(pri));
-                        Glide.with(OrderDish.this).load(updateDishModel.getImageURL()).into(imageView);
+                        Chef chef = dataSnapshot.getValue(Chef.class);
 
-                        chefdata = FirebaseDatabase.getInstance().getReference("Chef").child(ChefID);
-                        chefdata.addListenerForSingleValueEvent(new ValueEventListener() {
+                        String name = "<b>" + "Chef Name: " + "</b>" + chef.getFname() + " " + chef.getLname();
+                        ChefName.setText(Html.fromHtml(name));
+                        String loc = "<b>" + "Location: " + "</b>" + chef.getArea();
+                        ChefLoaction.setText(Html.fromHtml(loc));
+                        custID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                        databaseReference = FirebaseDatabase.getInstance().getReference("Cart").child("CartItems").child(custID).child(RandomId);
+                        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                Chef chef = dataSnapshot.getValue(Chef.class);
-
-                                String name = "<b>" + "Chef Name: " + "</b>" + chef.getFname() + " " + chef.getLname();
-                                ChefName.setText(Html.fromHtml(name));
-                                String loc = "<b>" + "Location: " + "</b>" + chef.getArea();
-                                ChefLoaction.setText(Html.fromHtml(loc));
-                                custID = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                                databaseReference = FirebaseDatabase.getInstance().getReference("Cart").child("CartItems").child(custID).child(RandomId);
-                                databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                        Cart cart = dataSnapshot.getValue(Cart.class);
-                                        if (dataSnapshot.exists()) {
-                                            additem.setNumber(cart.getDishQuantity());
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                    }
-                                });
+                                Cart cart = dataSnapshot.getValue(Cart.class);
+                                if (dataSnapshot.exists()) {
+                                    additem.setNumber(cart.getDishQuantity());
+                                }
                             }
 
                             @Override
@@ -132,17 +126,17 @@ public class OrderDish extends AppCompatActivity {
                         dataref.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                Cart cart1=null;
+                                Cart cart1 = null;
                                 if (dataSnapshot.exists()) {
-                                    int totalcount=0;
-                                    for(DataSnapshot snapshot:dataSnapshot.getChildren()){
+                                    int totalcount = 0;
+                                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                         totalcount++;
                                     }
-                                    int i=0;
-                                    for(DataSnapshot snapshot:dataSnapshot.getChildren()){
+                                    int i = 0;
+                                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                         i++;
-                                        if(i==totalcount){
-                                            cart1= snapshot.getValue(Cart.class);
+                                        if (i == totalcount) {
+                                            cart1 = snapshot.getValue(Cart.class);
                                         }
                                     }
 
@@ -186,9 +180,7 @@ public class OrderDish extends AppCompatActivity {
 
                                             }
                                         });
-                                    }
-                                    else
-                                    {
+                                    } else {
                                         androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(OrderDish.this);
                                         builder.setMessage("You can't add food items of multiple chef at a time. Try to add items of same chef");
                                         builder.setCancelable(false);
@@ -263,4 +255,4 @@ public class OrderDish extends AppCompatActivity {
             }
         });
     }
-   }
+}

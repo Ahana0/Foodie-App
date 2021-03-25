@@ -107,10 +107,10 @@ public class Registration extends AppCompatActivity {
                                         hashMappp.put("Area", Area);
                                         hashMappp.put("ConfirmPassword", confirmpassword);
                                         hashMappp.put("EmailID", emailid);
-                                        hashMappp.put("Fname", Fname2);
+                                        hashMappp.put("FirstName", Fname2);
                                         hashMappp.put("House", house);
-                                        hashMappp.put("Lname", lname);
-                                        hashMappp.put("Mobile", mobile);
+                                        hashMappp.put("LastName", lname);
+                                        hashMappp.put("MobileNo", mobile);
                                         hashMappp.put("Password", password);
                                         hashMappp.put("Postcode", zipCode);
 

@@ -1,5 +1,6 @@
 package com.example.foodie.customerFoodPanel;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -9,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,7 +20,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.example.foodie.MainActivity;
+import com.example.foodie.MainMenu;
 import com.example.foodie.R;
+import com.example.foodie.chefFoodPanel.Chef_order_dishes;
+import com.example.foodie.chefFoodPanel.FoodDetails;
 import com.example.foodie.chefFoodPanel.UpdateDishModel;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -33,17 +39,19 @@ import java.util.List;
 public class CustomerHomeFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
     RecyclerView recyclerView;
-    private List<UpdateDishModel> updateDishModelList;
+    private List<FoodDetails> updateDishModelList;
     private CustomerHomeAdapter adapter;
     DatabaseReference dataaa, databaseReference;
     SwipeRefreshLayout swipeRefreshLayout;
     SearchView searchView;
     String area;
+    View view;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_customerhome, null);
+        view=v;
         getActivity().setTitle("Foodie");
         setHasOptionsMenu(true);
         recyclerView = v.findViewById(R.id.recycle_menu);
@@ -66,10 +74,16 @@ public class CustomerHomeFragment extends Fragment implements SwipeRefreshLayout
                 dataaa.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        Customer cust = dataSnapshot.getValue(Customer.class);
-
-                        area=cust.getArea();
-                        customermenu();
+                        try {
+                            Customer cust = dataSnapshot.getValue(Customer.class);
+                            area=cust.getArea();
+                            customermenu();
+                        }catch (NullPointerException nullPointerException){
+                            Toast.makeText(view.getContext(),"Customer not valid.",Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(view.getContext(), MainMenu.class);
+                            view.getContext().startActivity(intent);
+                            getActivity().finish();
+                        }
                     }
 
                     @Override
@@ -100,7 +114,7 @@ public class CustomerHomeFragment extends Fragment implements SwipeRefreshLayout
                 updateDishModelList.clear();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     for (DataSnapshot snapshot1 : snapshot.getChildren()) {
-                        UpdateDishModel updateDishModel = snapshot1.getValue(UpdateDishModel.class);
+                        FoodDetails updateDishModel = snapshot1.getValue(FoodDetails.class);
                         updateDishModelList.add(updateDishModel);
                     }
                 }

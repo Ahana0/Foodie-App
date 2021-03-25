@@ -9,6 +9,16 @@ public class UpdateDishModel {
 
     }
 
+    public UpdateDishModel(String dishes, String randomUID, String description, String quantity, String price, String imageURL, String chefId) {
+        Dishes = dishes;
+        RandomUID = randomUID;
+        Description = description;
+        Quantity = quantity;
+        Price = price;
+        ImageURL = imageURL;
+        ChefId = chefId;
+    }
+
     public String getDishes() {
         return Dishes;
     }

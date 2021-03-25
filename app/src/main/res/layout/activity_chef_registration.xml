@@ -67,7 +67,6 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:drawableLeft="@drawable/ic_baseline_email_24"
                     android:drawablePadding="10dp"
                     android:hint="Email id"
                     android:inputType="textEmailAddress" />
@@ -243,7 +242,6 @@
                     android:layout_marginLeft="30dp"
                     android:layout_marginRight="20dp"
                     android:layout_weight="1"
-
                     android:backgroundTint="@color/button_background_color"
                     android:drawablePadding="5dp"
                     android:padding="8dp"

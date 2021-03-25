@@ -70,12 +70,8 @@ public class ChefHomeFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Chef chefc = dataSnapshot.getValue(Chef.class);
-
                 area=chefc.getArea();
                 chefDishes();
-
-
-
             }
 
             @Override
@@ -88,7 +84,6 @@ public class ChefHomeFragment extends Fragment {
         return v;
     }
 
-
     private void chefDishes() {
 
         String useridd = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -100,7 +95,6 @@ public class ChefHomeFragment extends Fragment {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     UpdateDishModel updateDishModel = snapshot.getValue(UpdateDishModel.class);
                     updateDishModelList.add(updateDishModel);
-
                 }
                 adapter = new ChefHomeAdapter(getContext(), updateDishModelList);
                 recyclerView.setAdapter(adapter);
@@ -114,16 +108,7 @@ public class ChefHomeFragment extends Fragment {
 
     }
 
-
-
-
-
-
-
-
-
     private void Logout() {
-
         FirebaseAuth.getInstance().signOut();
         Intent intent = new Intent(getActivity(), MainMenu.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK );

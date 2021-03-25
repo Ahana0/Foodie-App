@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -28,12 +29,13 @@ public class MainActivity extends AppCompatActivity {
     FirebaseAuth Fauth;
     FirebaseDatabase firebaseDatabase;
     DatabaseReference databaseReference;
-
+FirebaseUser firebaseUser;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        Fauth = FirebaseAuth.getInstance();
+        firebaseUser=Fauth.getCurrentUser();
         imageView = (ImageView) findViewById(R.id.imageView);
         textView = (TextView) findViewById(R.id.textView2);
 
@@ -57,11 +59,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
 
-                Fauth = FirebaseAuth.getInstance();
-                if (Fauth.getCurrentUser() != null) {
-                    if (Fauth.getCurrentUser().isEmailVerified()) {
+
+                if (firebaseUser != null) {
+                    if (firebaseUser.isEmailVerified()) {
                         Fauth = FirebaseAuth.getInstance();
-                        databaseReference = FirebaseDatabase.getInstance().getReference("User").child(FirebaseAuth.getInstance().getUid() + "/Role");
+                        databaseReference = FirebaseDatabase.getInstance().getReference("User").child(firebaseUser.getUid() + "/Role");
                         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -82,6 +84,10 @@ public class MainActivity extends AppCompatActivity {
                                         startActivity(intent);
                                         finish();
                                     }
+                                }else{
+                                    Intent intent = new Intent(MainActivity.this, MainMenu.class);
+                                    startActivity(intent);
+                                    finish();
                                 }
                             }
 

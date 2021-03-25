@@ -5,6 +5,7 @@ import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -14,6 +15,7 @@ public class ChooseOne extends AppCompatActivity {
     Intent intent;
     String type;
     ConstraintLayout bgimage;
+    ImageView backBtnImageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,6 +24,15 @@ public class ChooseOne extends AppCompatActivity {
         Chef = (Button) findViewById(R.id.chef);
         DeliveryPerson = (Button) findViewById(R.id.delivery);
         Customer = (Button) findViewById(R.id.customer);
+        backBtnImageView=findViewById(R.id.backBtn);
+        backBtnImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent mainMenuIntent = new Intent(ChooseOne.this, MainMenu.class);
+                startActivity(mainMenuIntent);
+                finish();
+            }
+        });
         AnimationDrawable animationDrawable = new AnimationDrawable();
         animationDrawable.addFrame(getResources().getDrawable(R.drawable.bghome2), 3000);
         animationDrawable.addFrame(getResources().getDrawable(R.drawable.pic2), 3000);

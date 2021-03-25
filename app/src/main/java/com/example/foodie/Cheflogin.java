@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
@@ -60,10 +61,7 @@ public class Cheflogin extends AppCompatActivity {
                         Fauth.signInWithEmailAndPassword(emailid,pwd).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
-
                                 if(task.isSuccessful()){
-                                    mDialog.dismiss();
-
                                     if(Fauth.getCurrentUser().isEmailVerified()){
                                         mDialog.dismiss();
                                         Toast.makeText(Cheflogin.this, "Congratulation! You Have Successfully Login", Toast.LENGTH_SHORT).show();
@@ -72,13 +70,21 @@ public class Cheflogin extends AppCompatActivity {
                                         finish();
 
                                     }else{
-                                        ReusableCodeForAll.ShowAlert(Cheflogin.this,"Verification Failed","You Have Not Verified Your Email");
-
+                                        mDialog.dismiss();
+                                        Toast.makeText(Cheflogin.this,"Email Verification Failed.",Toast.LENGTH_SHORT).show();
+//                                        ReusableCodeForAll.ShowAlert(Cheflogin.this,"Verification Failed","You Have Not Verified Your Email");
                                     }
                                 }else{
                                     mDialog.dismiss();
-                                    ReusableCodeForAll.ShowAlert(Cheflogin.this,"Error",task.getException().getMessage());
+                                    Toast.makeText(Cheflogin.this,"Sign In Failed.",Toast.LENGTH_SHORT).show();
+//                                    ReusableCodeForAll.ShowAlert(Cheflogin.this,"Error",task.getException().getMessage());
                                 }
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                mDialog.dismiss();
+                                Toast.makeText(Cheflogin.this,"Sign In Failed.",Toast.LENGTH_SHORT).show();
                             }
                         });
                     }

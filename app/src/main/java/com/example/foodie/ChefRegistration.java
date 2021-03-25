@@ -11,8 +11,10 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
@@ -91,16 +93,16 @@ public class ChefRegistration extends AppCompatActivity {
                                     public void onComplete(@NonNull Task<Void> task) {
 
                                         HashMap<String, String> hashMap1 = new HashMap<>();
-                                        hashMap1.put("Mobile No", mobile);
-                                        hashMap1.put("First Name", fname);
-                                        hashMap1.put("Last Name", lname);
+                                        hashMap1.put("Mobile", mobile);
+                                        hashMap1.put("Fname", fname);
+                                        hashMap1.put("Lname", lname);
                                         hashMap1.put("EmailId", emailid);
 
                                         hashMap1.put("Area", Area);
                                         hashMap1.put("Password", password);
                                         hashMap1.put("Pincode", Pincode);
 
-                                        hashMap1.put("Confirm Password", confpassword);
+                                        hashMap1.put("ConfirmPassword", confpassword);
                                         hashMap1.put("House", house);
 
                                         firebaseDatabase.getInstance().getReference("Chef")
@@ -109,6 +111,7 @@ public class ChefRegistration extends AppCompatActivity {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 mDialog.dismiss();
+                                                Toast.makeText(ChefRegistration.this,"Registration Successful.",Toast.LENGTH_SHORT).show();
 
                                                 FAuth.getCurrentUser().sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
                                                     @Override
@@ -124,7 +127,7 @@ public class ChefRegistration extends AppCompatActivity {
 
                                                                     dialog.dismiss();
                                                                     String phonenumber = mobile;
-                                                                    Intent b = new Intent(ChefRegistration.this, Chefloginphone.class);
+                                                                    Intent b = new Intent(ChefRegistration.this, MainMenu.class);
                                                                     b.putExtra("phonenumber", phonenumber);
                                                                     startActivity(b);
 
@@ -139,6 +142,12 @@ public class ChefRegistration extends AppCompatActivity {
                                                     }
                                                 });
 
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                mDialog.dismiss();
+                                                Toast.makeText(ChefRegistration.this,"Failed to register.",Toast.LENGTH_SHORT).show();
                                             }
                                         });
 

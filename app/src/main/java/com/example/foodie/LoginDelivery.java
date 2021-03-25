@@ -67,15 +67,14 @@ public class LoginDelivery extends AppCompatActivity {
                                     startActivity(z);
                                     finish();
 
-
                                 } else {
-                                    ReusableCodeForAll.ShowAlert(LoginDelivery.this, "", "Please Verify your Email");
+                                    mDialog.dismiss();
+                                    Toast.makeText(LoginDelivery.this, "Please Verify your Email", Toast.LENGTH_SHORT).show();
                                 }
 
                             } else {
-
                                 mDialog.dismiss();
-                                ReusableCodeForAll.ShowAlert(LoginDelivery.this, "Error", task.getException().getMessage());
+                                Toast.makeText(LoginDelivery.this, "Delivery Person Login Failed.", Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
