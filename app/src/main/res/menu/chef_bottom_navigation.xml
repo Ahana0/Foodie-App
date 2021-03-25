@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/chefhome"
+        android:icon="@drawable/ic_baseline_home_24"
+        android:title="Home"/>
+
+    <item android:id="@+id/pendingOrders"
+        android:icon="@drawable/ic_pendingorders_24"
+        android:title="Pending Orders"/>
+
+    <item android:id="@+id/orders"
+        android:icon="@drawable/ic_orders_24"
+        android:title="Orders"/>
+
+    <item android:id="@+id/chefProfile"
+        android:icon="@drawable/ic_postdishes_24"
+        android:title="Post Dishes"/>
+</menu>

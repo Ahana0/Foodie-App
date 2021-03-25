@@ -1,0 +1,69 @@
+<resources>
+    <string name="app_name">FOODIE</string>
+    <string name="title_activity_tracking_order">Map</string>
+    <string name="title_home">Home</string>
+
+    <string name="title_dashboard">Dashboard</string>
+
+    <string name="title_notifications">Notifications</string>
+
+    <string-array name="State">
+        <item>Dhaka</item>
+        <item>Chittagong</item>
+    </string-array>
+
+
+    <string-array name="shipper">
+
+        <item>Shipper 1</item>
+
+        <item>Shipper 2</item>
+
+    </string-array>
+
+
+    <string-array name="DishName">
+
+        <item>Chicken Cheese Burger</item>
+        <item> Rice</item>
+        <item>Biriyani</item>
+        <item>Roti</item>
+        <item>Khichuri</item>
+        <item>Doi Fuchka</item>
+        <item>Porota</item>
+        <item>Brownie with Icecream</item>
+        <item>Aloo Paratha</item>
+        <item>Patra</item>
+        <item>Jilapi with Rabri</item>
+        <item>Gulab Jamun</item>
+        <item>Grilled Chicken</item>
+        <item>Roshmalai</item>
+        <item>Halim</item>
+        <item>Chotpoti</item>
+        <item>Butter naan</item>
+        <item>Pancake</item>
+        <item>Biryani</item>
+        <item>Rajma</item>
+        <item>Chocolate cold Coffee</item>
+        <item>Shwarma</item>
+        <item>Oven baked pasta</item>
+        <item>Chicken Cheese Nachos</item>
+        <item>Samosa</item>
+        <item>Chocolate cake</item>
+        <item>Bhapa pitha</item>
+        <item>Chitoi pitha</item>
+        <item>Strawberry Milkshake</item>
+        <item>Polao Roast</item>
+        <item>Mix Vegetable</item>
+        <item>Muffins</item>
+        <item>Dal Bhuna</item>
+        <item>Alu Bhorta</item>
+        <item>Nutella Brownie</item>
+        <item>Fried Chicken</item>
+        <item>Pomfret Fish</item>
+        <item>Egg Fry</item>
+        <item>Chocoalte tart</item>
+        <item>Hyderabadi Chicken Biryni</item>
+    </string-array>
+
+</resources>
