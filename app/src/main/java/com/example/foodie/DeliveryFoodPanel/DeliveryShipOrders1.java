@@ -1,6 +1,8 @@
 package com.example.foodie.DeliveryFoodPanel;
 
-public class DeliveryShipOrders1 {
+import java.io.Serializable;
+
+public class DeliveryShipOrders1 implements Serializable {
 
     private String Address, ChefId, ChefName, GrandTotalPrice, MobileNumber, Name, RandomUID, Status, UserId;
 

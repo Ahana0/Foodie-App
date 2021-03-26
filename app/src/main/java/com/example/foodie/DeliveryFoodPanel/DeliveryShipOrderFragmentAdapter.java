@@ -52,18 +52,17 @@ public class DeliveryShipOrderFragmentAdapter extends RecyclerView.Adapter<Deliv
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-
-        final DeliveryShipFinalOrders1 deliveryShipFinalOrders1 = deliveryShipFinalOrders1list.get(position);
+        DeliveryShipFinalOrders1 deliveryShipFinalOrders1 = deliveryShipFinalOrders1list.get(position);
         holder.Address.setText(deliveryShipFinalOrders1.getAddress());
         holder.grandtotalprice.setText("Grand Total: BDT " + deliveryShipFinalOrders1.getGrandTotalPrice());
         holder.mobilenumber.setText("+880" + deliveryShipFinalOrders1.getMobileNumber());
-        final String random = deliveryShipFinalOrders1.getRandomUID();
-        final String userid = deliveryShipFinalOrders1.getUserId();
+        String random = deliveryShipFinalOrders1.getRandomUID();
+        String userid = deliveryShipFinalOrders1.getUserId();
         holder.Vieworder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context, DeliveryShipOrderView.class);
-                intent.putExtra("RandomUID", random);
+                intent.putExtra("deliveryShipFinalOrderObject", deliveryShipFinalOrders1);
                 context.startActivity(intent);
             }
         });
@@ -72,27 +71,12 @@ public class DeliveryShipOrderFragmentAdapter extends RecyclerView.Adapter<Deliv
             @Override
             public void onClick(View v) {
 
-                FirebaseDatabase.getInstance().getReference("CustomerFinalOrders").child(userid).child(random).child("OtherInformation").child("Status").setValue("Your Order is on the way...").addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        FirebaseDatabase.getInstance().getReference().child("Tokens").child(userid).child("token").addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                String usertoken = dataSnapshot.getValue(String.class);
-                                sendNotifications(usertoken, "Estimated Time", "Your Order has been collected by Delivery Person, He is on the way", "DeliverOrder");
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                            }
-                        });
-                    }
-                }).addOnSuccessListener(new OnSuccessListener<Void>() {
+                FirebaseDatabase.getInstance().getReference("CustomerFinalOrders").child(userid).child(random).child("OtherInformation").child("Status").setValue("Your Order is on the way...")
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         Intent intent = new Intent(context, Delivery_ShippingOrder.class);
-                        intent.putExtra("RandomUID",random);
+                        intent.putExtra("deliveryShipFinalOrderObject", deliveryShipFinalOrders1);
                         context.startActivity(intent);
                     }
                 });

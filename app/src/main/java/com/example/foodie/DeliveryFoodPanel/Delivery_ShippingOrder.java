@@ -24,6 +24,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -43,11 +44,15 @@ public class Delivery_ShippingOrder extends AppCompatActivity {
     LinearLayout l1, l2;
     String randomuid;
     String userid, Chefid;
+    FirebaseUser firebaseUser;
+    DeliveryShipFinalOrders1 deliveryShipFinalOrderObject;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.delivery_shiporders);
+        deliveryShipFinalOrderObject=(DeliveryShipFinalOrders1) getIntent().getSerializableExtra("deliveryShipFinalOrderObject");
+        firebaseUser=FirebaseAuth.getInstance().getCurrentUser();
         Address = (TextView) findViewById(R.id.ad3);
         ChefName = (TextView) findViewById(R.id.chefname2);
         grandtotal = (TextView) findViewById(R.id.Shiptotal1);
@@ -58,124 +63,62 @@ public class Delivery_ShippingOrder extends AppCompatActivity {
         Call = (Button) findViewById(R.id.call2);
         Shipped = (Button) findViewById(R.id.shipped2);
         apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
+        setInfo();
         Shipped();
 
     }
 
+    private void setInfo() {
+        grandtotal.setText("BDT " + deliveryShipFinalOrderObject.getGrandTotalPrice());
+        Address.setText(deliveryShipFinalOrderObject.getAddress());
+        Custname.setText(deliveryShipFinalOrderObject.getName());
+        MobileNumber.setText("+880" + deliveryShipFinalOrderObject.getMobileNumber());
+        ChefName.setText("Chef " + deliveryShipFinalOrderObject.getChefName());
+        userid = deliveryShipFinalOrderObject.getUserId();
+        Chefid = deliveryShipFinalOrderObject.getChefId();
+        randomuid = deliveryShipFinalOrderObject.getRandomUID();
+    }
+
     private void Shipped() {
 
-        randomuid = getIntent().getStringExtra("RandomUID");
-
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("DeliveryShipFinalOrders").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(randomuid).child("OtherInformation");
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        Shipped.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                DeliveryShipFinalOrders1 deliveryShipFinalOrders1 = dataSnapshot.getValue(DeliveryShipFinalOrders1.class);
-                grandtotal.setText("BDT " + deliveryShipFinalOrders1.getGrandTotalPrice());
-                Address.setText(deliveryShipFinalOrders1.getAddress());
-                Custname.setText(deliveryShipFinalOrders1.getName());
-                MobileNumber.setText("+880" + deliveryShipFinalOrders1.getMobileNumber());
-                ChefName.setText("Chef " + deliveryShipFinalOrders1.getChefName());
-                userid = deliveryShipFinalOrders1.getUserId();
-                Chefid = deliveryShipFinalOrders1.getChefId();
-                Shipped.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                FirebaseDatabase.getInstance().getReference("CustomerFinalOrders").child(userid).child(randomuid).child("OtherInformation").child("Status").setValue("Your Order is delivered")
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
-                    public void onClick(View v) {
-                        FirebaseDatabase.getInstance().getReference("CustomerFinalOrders").child(userid).child(randomuid).child("OtherInformation").child("Status").setValue("Your Order is delivered").addOnSuccessListener(new OnSuccessListener<Void>() {
+                    public void onSuccess(Void aVoid) {
+                        FirebaseDatabase.getInstance().getReference("CustomerFinalOrders").child(userid).child(randomuid).removeValue();
+                        FirebaseDatabase.getInstance().getReference("DeliveryShipFinalOrders").child(firebaseUser.getUid()).child(randomuid).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
-                            public void onSuccess(Void aVoid) {
-                                FirebaseDatabase.getInstance().getReference().child("Tokens").child(userid).child("token").addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                        String usertoken = dataSnapshot.getValue(String.class);
-                                        sendNotifications(usertoken, "Home Chef", "Thank you for Ordering", "ThankYou");
-                                    }
-
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                    }
-                                });
-                            }
-                        }).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                FirebaseDatabase.getInstance().getReference().child("Tokens").child(Chefid).child("token").addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                        String usertoken = dataSnapshot.getValue(String.class);
-                                        sendNotifications(usertoken, "Order Placed", "Your food has been delivered to Customer's Doorstep", "Delivered");
-                                    }
-
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                    }
-                                });
-                            }
-                        }).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                AlertDialog.Builder builder = new AlertDialog.Builder(Delivery_ShippingOrder.this);
-                                builder.setMessage("Order is delivered, Now you can check for new Orders");
-                                builder.setCancelable(false);
-                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-
-                                        dialog.dismiss();
-                                        Intent intent = new Intent(Delivery_ShippingOrder.this, DeliveryFoodPanel_NavigationBottom.class);
-                                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                        startActivity(intent);
-                                        finish();
-
-
-                                    }
-                                });
-                                AlertDialog alert = builder.create();
-                                alert.show();
-                            }
-                        }).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                FirebaseDatabase.getInstance().getReference("CustomerFinalOrders").child(userid).child(randomuid).child("Dishes").removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        FirebaseDatabase.getInstance().getReference("CustomerFinalOrders").child(userid).child(randomuid).child("OtherInformation").removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<Void> task) {
-                                                FirebaseDatabase.getInstance().getReference("DeliveryShipFinalOrders").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(randomuid).child("Dishes").removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                    @Override
-                                                    public void onComplete(@NonNull Task<Void> task) {
-                                                        FirebaseDatabase.getInstance().getReference("DeliveryShipFinalOrders").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(randomuid).child("OtherInformation").removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                            @Override
-                                                            public void onSuccess(Void aVoid) {
-                                                                FirebaseDatabase.getInstance().getReference("AlreadyOrdered").child(userid).child("isOrdered").setValue("false");
-                                                            }
-                                                        });
-                                                    }
-                                                });
-                                            }
-                                        });
-                                    }
-                                });
+                            public void onComplete(@NonNull Task<Void> task) {
+                                FirebaseDatabase.getInstance().getReference("AlreadyOrdered").child(userid).child("isOrdered").setValue("false");
                             }
                         });
+                        AlertDialog.Builder builder = new AlertDialog.Builder(Delivery_ShippingOrder.this);
+                        builder.setMessage("Order is delivered, Now you can check for new Orders");
+                        builder.setCancelable(false);
+                        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                                Intent intent = new Intent(Delivery_ShippingOrder.this, DeliveryFoodPanel_NavigationBottom.class);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                startActivity(intent);
+                                finish();
+                            }
+                        });
+                        AlertDialog alert = builder.create();
+                        alert.show();
                     }
                 });
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
             }
         });
+
 
     }
 
     private void sendNotifications(String usertoken, String title, String message, String order) {
-
         Data data = new Data(title, message, order);
         NotificationSender sender = new NotificationSender(data, usertoken);
         apiService.sendNotification(sender).enqueue(new Callback<MyResponse>() {

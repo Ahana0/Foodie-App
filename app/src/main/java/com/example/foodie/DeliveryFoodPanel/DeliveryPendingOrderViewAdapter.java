@@ -33,7 +33,6 @@ public class DeliveryPendingOrderViewAdapter extends RecyclerView.Adapter<Delive
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-
         final DeliveryShipOrders deliveryShipOrders = deliveryShipOrderslist.get(position);
         holder.dishname.setText(deliveryShipOrders.getDishName());
         holder.price.setText("Price: BDT " + deliveryShipOrders.getDishPrice());

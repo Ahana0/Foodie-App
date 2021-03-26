@@ -29,6 +29,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -53,11 +54,13 @@ public class ChefPreparedOrderView extends AppCompatActivity {
     String RandomUID, userid;
     TextView grandtotal, address, name, number;
     LinearLayout l1;
-    Button Prepared;
+    Button sendOrderBtn;
     private ProgressDialog progressDialog;
     private APIService apiService;
     Spinner Shipper;
     String deliveryId = "oCpc4SwLVFbKO0fPdtp4R6bmDmI3";
+    FirebaseAuth firebaseAuth;
+    FirebaseUser firebaseUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +73,7 @@ public class ChefPreparedOrderView extends AppCompatActivity {
         number = findViewById(R.id.Cnumber);
         l1 = findViewById(R.id.linear);
         Shipper = findViewById(R.id.shipper);
-        Prepared = findViewById(R.id.prepared);
+        sendOrderBtn = findViewById(R.id.prepared);
         apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
         progressDialog = new ProgressDialog(ChefPreparedOrderView.this);
         progressDialog.setCanceledOnTouchOutside(false);
@@ -79,13 +82,15 @@ public class ChefPreparedOrderView extends AppCompatActivity {
         recyclerViewdish.setLayoutManager(new LinearLayoutManager(ChefPreparedOrderView.this));
         chefFinalOrdersList = new ArrayList<>();
         CheforderdishesView();
+        firebaseAuth=FirebaseAuth.getInstance();
+        firebaseUser=firebaseAuth.getCurrentUser();
     }
 
     private void CheforderdishesView() {
 
         RandomUID = getIntent().getStringExtra("RandomUID");
 
-        reference = FirebaseDatabase.getInstance().getReference("ChefFinalOrders").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(RandomUID).child("Dishes");
+        reference = FirebaseDatabase.getInstance().getReference("ChefFinalOrders").child(firebaseUser.getUid()).child(RandomUID).child("Dishes");
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -100,45 +105,36 @@ public class ChefPreparedOrderView extends AppCompatActivity {
 
                 } else {
                     l1.setVisibility(View.VISIBLE);
-                    Prepared.setOnClickListener(new View.OnClickListener() {
+                    sendOrderBtn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
 
                             progressDialog.setMessage("Please wait...");
                             progressDialog.show();
 
-                            DatabaseReference data = FirebaseDatabase.getInstance().getReference("Chef").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                            DatabaseReference data = FirebaseDatabase.getInstance().getReference("Chef").child(firebaseUser.getUid());
                             data.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                     final Chef chef = dataSnapshot.getValue(Chef.class);
                                     final String ChefName = chef.getFname() + " " + chef.getLname();
-                                    DatabaseReference databaseReference1 = FirebaseDatabase.getInstance().getReference("ChefFinalOrders").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(RandomUID).child("Dishes");
+                                    DatabaseReference databaseReference1 = FirebaseDatabase.getInstance().getReference("ChefFinalOrders").child(firebaseUser.getUid()).child(RandomUID).child("Dishes");
                                     databaseReference1.addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                             for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
-                                                final ChefFinalOrders chefFinalOrders = dataSnapshot1.getValue(ChefFinalOrders.class);
-                                                HashMap<String, String> hashMap = new HashMap<>();
+                                                ChefFinalOrders chefFinalOrders = dataSnapshot1.getValue(ChefFinalOrders.class);
                                                 String dishid = chefFinalOrders.getDishId();
                                                 userid = chefFinalOrders.getUserId();
-                                                hashMap.put("ChefId", chefFinalOrders.getChefId());
-                                                hashMap.put("DishId", chefFinalOrders.getDishId());
-                                                hashMap.put("DishName", chefFinalOrders.getDishName());
-                                                hashMap.put("DishPrice", chefFinalOrders.getDishPrice());
-                                                hashMap.put("DishQuantity", chefFinalOrders.getDishQuantity());
-                                                hashMap.put("RandomUID", RandomUID);
-                                                hashMap.put("TotalPrice", chefFinalOrders.getTotalPrice());
-                                                hashMap.put("UserId", chefFinalOrders.getUserId());
-                                                FirebaseDatabase.getInstance().getReference("DeliveryShipOrders").child(deliveryId).child(RandomUID).child("Dishes").child(dishid).setValue(hashMap);
+                                                FirebaseDatabase.getInstance().getReference("DeliveryShipOrders").child(deliveryId).child(RandomUID).child("Dishes").child(dishid).setValue(chefFinalOrders);
                                             }
-                                            DatabaseReference data = FirebaseDatabase.getInstance().getReference("ChefFinalOrders").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(RandomUID).child("OtherInformation");
+                                            DatabaseReference data = FirebaseDatabase.getInstance().getReference("ChefFinalOrders").child(firebaseUser.getUid()).child(RandomUID).child("OtherInformation");
                                             data.addListenerForSingleValueEvent(new ValueEventListener() {
                                                 @Override
                                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                     final ChefFinalOrders1 chefFinalOrders1 = dataSnapshot.getValue(ChefFinalOrders1.class);
                                                     HashMap<String, String> hashMap1 = new HashMap<>();
-                                                    String chefid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                                                    String chefid = firebaseUser.getUid();
                                                     hashMap1.put("Address", chefFinalOrders1.getAddress());
                                                     hashMap1.put("ChefId", chefid);
                                                     hashMap1.put("ChefName", ChefName);

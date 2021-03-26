@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.foodie.R;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -24,17 +25,21 @@ import java.util.List;
 public class DeliveryShipOrderView extends AppCompatActivity {
 
     RecyclerView recyclerViewdish;
-    private List<DeliveryShipFinalOrders> deliveryShipFinalOrdersList;
+    private List<DeliveryShipFinalOrders> deliveryShipFinalOrdersList = new ArrayList<>();
     private DeliveryShipOrderViewAdapter adapter;
     DatabaseReference reference;
     String RandomUID;
     TextView grandtotal, address, name, number, ChefName;
     LinearLayout l1;
+    DeliveryShipFinalOrders1 deliveryShipFinalOrderObject;
+    FirebaseUser firebaseUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.delivery_ship_order_view);
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        deliveryShipFinalOrderObject = (DeliveryShipFinalOrders1) getIntent().getSerializableExtra("deliveryShipFinalOrderObject");
         recyclerViewdish = findViewById(R.id.delishipvieworder);
         recyclerViewdish.setHasFixedSize(true);
         recyclerViewdish.setLayoutManager(new LinearLayoutManager(DeliveryShipOrderView.this));
@@ -44,15 +49,23 @@ public class DeliveryShipOrderView extends AppCompatActivity {
         address = (TextView) findViewById(R.id.ShipAddress);
         name = (TextView) findViewById(R.id.ShipName);
         number = (TextView) findViewById(R.id.ShipNumber);
-        deliveryShipFinalOrdersList = new ArrayList<>();
+        setInfo();
         deliveryfinalorders();
+    }
+
+    private void setInfo() {
+        grandtotal.setText("BDT " + deliveryShipFinalOrderObject.getGrandTotalPrice());
+        address.setText(deliveryShipFinalOrderObject.getAddress());
+        name.setText(deliveryShipFinalOrderObject.getName());
+        number.setText("+880" + deliveryShipFinalOrderObject.getMobileNumber());
+        ChefName.setText("Chef " + deliveryShipFinalOrderObject.getChefName());
     }
 
     private void deliveryfinalorders() {
 
-        RandomUID = getIntent().getStringExtra("RandomUID");
+        RandomUID = deliveryShipFinalOrderObject.getRandomUID();
 
-        reference = FirebaseDatabase.getInstance().getReference("DeliveryShipFinalOrders").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(RandomUID).child("Dishes");
+        reference = FirebaseDatabase.getInstance().getReference("DeliveryShipFinalOrders").child(firebaseUser.getUid()).child(RandomUID).child("Dishes");
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -77,23 +90,5 @@ public class DeliveryShipOrderView extends AppCompatActivity {
             }
         });
 
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("DeliveryShipFinalOrders").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(RandomUID).child("OtherInformation");
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                DeliveryShipFinalOrders1 deliveryShipFinalOrders1 = dataSnapshot.getValue(DeliveryShipFinalOrders1.class);
-                grandtotal.setText("BDT " + deliveryShipFinalOrders1.getGrandTotalPrice());
-                address.setText(deliveryShipFinalOrders1.getAddress());
-                name.setText(deliveryShipFinalOrders1.getName());
-                number.setText("+880" + deliveryShipFinalOrders1.getMobileNumber());
-                ChefName.setText("Chef " + deliveryShipFinalOrders1.getChefName());
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
     }
 }

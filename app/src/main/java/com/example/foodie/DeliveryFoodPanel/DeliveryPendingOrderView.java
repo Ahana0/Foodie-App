@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.foodie.R;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -24,35 +25,48 @@ import java.util.List;
 public class DeliveryPendingOrderView extends AppCompatActivity {
 
     RecyclerView recyclerViewdish;
-    private List<DeliveryShipOrders> deliveryShipOrdersList;
+    private List<DeliveryShipOrders> deliveryShipOrdersList= new ArrayList<>();
     private DeliveryPendingOrderViewAdapter adapter;
     DatabaseReference reference;
     String RandomUID;
-    TextView grandtotal, address, name, number,ChefName;
-    LinearLayout l1;
-
+    TextView grandTotalTextView, addressTextView, nameTextView, numberTextView, chefNameTextView;
+    LinearLayout linearLayout1;
+    DeliveryShipOrders1 deliveryShipOrderObject;
+    FirebaseAuth firebaseAuth;
+    FirebaseUser firebaseUser;
+    String deliveryId = "oCpc4SwLVFbKO0fPdtp4R6bmDmI3";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.delivery_pending_order_view);
+        deliveryShipOrderObject= (DeliveryShipOrders1) getIntent().getSerializableExtra("deliveryShipOrderObject");
         recyclerViewdish = findViewById(R.id.delivieworder);
         recyclerViewdish.setHasFixedSize(true);
         recyclerViewdish.setLayoutManager(new LinearLayoutManager(DeliveryPendingOrderView.this));
-        l1 = (LinearLayout) findViewById(R.id.linear1);
-        grandtotal = (TextView) findViewById(R.id.Dtotal);
-        address = (TextView) findViewById(R.id.DAddress);
-        ChefName=(TextView)findViewById(R.id.chefname);
-        name = (TextView) findViewById(R.id.DName);
-        number = (TextView) findViewById(R.id.DNumber);
-        deliveryShipOrdersList = new ArrayList<>();
-        deliveryorders();
+        linearLayout1 = (LinearLayout) findViewById(R.id.linear1);
+        grandTotalTextView = (TextView) findViewById(R.id.Dtotal);
+        addressTextView = (TextView) findViewById(R.id.DAddress);
+        chefNameTextView =(TextView)findViewById(R.id.chefname);
+        nameTextView = (TextView) findViewById(R.id.DName);
+        numberTextView = (TextView) findViewById(R.id.DNumber);
+        firebaseAuth=FirebaseAuth.getInstance();
+        firebaseUser=firebaseAuth.getCurrentUser();
+        setInfo();
+        deliveryOrders();
     }
 
-    private void deliveryorders() {
-        RandomUID = getIntent().getStringExtra("Random");
-                //getIntent().getStringExtra("Random");
+    private void setInfo() {
+        grandTotalTextView.setText("BDT " + deliveryShipOrderObject.getGrandTotalPrice());
+        addressTextView.setText(deliveryShipOrderObject.getAddress());
+        nameTextView.setText(deliveryShipOrderObject.getName());
+        numberTextView.setText("+880" + deliveryShipOrderObject.getMobileNumber());
+        chefNameTextView.setText("Chef "+ deliveryShipOrderObject.getChefName());
+    }
 
-        reference = FirebaseDatabase.getInstance().getReference("DeliveryShipOrders").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(RandomUID).child("Dishes");
+    private void deliveryOrders() {
+        RandomUID = deliveryShipOrderObject.getRandomUID();
+
+        reference = FirebaseDatabase.getInstance().getReference("DeliveryShipOrders").child(deliveryId).child(RandomUID).child("Dishes");
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -62,31 +76,12 @@ public class DeliveryPendingOrderView extends AppCompatActivity {
                     deliveryShipOrdersList.add(deliveryShipOrders);
                 }
                 if (deliveryShipOrdersList.size() == 0) {
-                    l1.setVisibility(View.INVISIBLE);
-
+                    linearLayout1.setVisibility(View.INVISIBLE);
                 } else {
-                    l1.setVisibility(View.VISIBLE);
+                    linearLayout1.setVisibility(View.VISIBLE);
+                    adapter = new DeliveryPendingOrderViewAdapter(DeliveryPendingOrderView.this, deliveryShipOrdersList);
+                    recyclerViewdish.setAdapter(adapter);
                 }
-                adapter = new DeliveryPendingOrderViewAdapter(DeliveryPendingOrderView.this, deliveryShipOrdersList);
-                recyclerViewdish.setAdapter(adapter);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("DeliveryShipOrders").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(RandomUID).child("OtherInformation");
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                DeliveryShipOrders1 deliveryShipOrders1 = dataSnapshot.getValue(DeliveryShipOrders1.class);
-                grandtotal.setText("BDT " + deliveryShipOrders1.getGrandTotalPrice());
-                address.setText(deliveryShipOrders1.getAddress());
-                name.setText(deliveryShipOrders1.getName());
-                number.setText("+880" + deliveryShipOrders1.getMobileNumber());
-                ChefName.setText("Chef "+ deliveryShipOrders1.getChefName());
 
             }
 
@@ -95,5 +90,6 @@ public class DeliveryPendingOrderView extends AppCompatActivity {
 
             }
         });
+
     }
 }
